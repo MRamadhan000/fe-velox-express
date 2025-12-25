@@ -122,11 +122,39 @@ export default function EditPacketPage() {
       if (formData.destination_address.trim()) submitData.append('destination_address', formData.destination_address.trim());
       if (formData.weight > 0) submitData.append('weight', formData.weight.toString());
 
-      if (formData.packet_image) {
-        submitData.append('packet_image', formData.packet_image);
+      // Only append packet_image if a valid file is selected
+      if (formData.packet_image && formData.packet_image instanceof File) {
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (allowedTypes.includes(formData.packet_image.type) && formData.packet_image.size <= 2 * 1024 * 1024) {
+          submitData.append('packet_image', formData.packet_image);
+        }
       }
 
-      await packetService.update(parseInt(packetId), submitData);
+      // Debug: Log what we're sending
+      console.log('Submitting data:');
+      for (let [key, value] of submitData.entries()) {
+        console.log(key, value instanceof File ? `File: ${value.name} (${value.type})` : value);
+      }
+
+      // Check if we have a file to upload
+      const hasFile = formData.packet_image && formData.packet_image instanceof File;
+
+      if (hasFile) {
+        // Send as FormData with file
+        await packetService.update(parseInt(packetId), submitData);
+      } else {
+        // Send as JSON without file
+        const jsonData = {
+          sender_name: formData.sender_name.trim(),
+          sender_phone: formData.sender_phone.trim(),
+          pickup_address: formData.pickup_address.trim(),
+          receiver_name: formData.receiver_name.trim(),
+          receiver_phone: formData.receiver_phone.trim(),
+          destination_address: formData.destination_address.trim(),
+          weight: formData.weight
+        };
+        await packetService.update(parseInt(packetId), jsonData);
+      }
       setSuccess('Packet updated successfully');
 
       // Redirect back to packets list after a short delay
@@ -134,6 +162,7 @@ export default function EditPacketPage() {
         router.push('/admin/packets');
       }, 1500);
     } catch (error: any) {
+      console.error('Update error:', error);
       setError(error.message || 'Failed to update packet');
     } finally {
       setSaving(false);
@@ -142,7 +171,25 @@ export default function EditPacketPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Please select a valid image file (JPG, JPEG, or PNG)');
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+      if (file.size > maxSize) {
+        setError('Image file size must be less than 2MB');
+        return;
+      }
+    }
+
     setFormData(prev => ({ ...prev, packet_image: file }));
+    setError(null); // Clear any previous error
   };
 
   const handleInputChange = (field: keyof PacketPayload, value: string | number) => {

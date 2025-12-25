@@ -67,28 +67,16 @@ export const packetService = {
   },
 
   // Update packet
-  update: async (
-    id: number,
-    data: FormData | object,
-    hasFile: boolean = false
-  ) => {
+  // Update packet
+  update: async (id: number, data: FormData | object) => {
     try {
-      let response;
-      if (hasFile && data instanceof FormData) {
-        response = await axios.put(`${API_URL}/${id}`, data, {
-          headers: {
-            ...authUtils.getAuthHeaders(),
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      } else {
-        response = await axios.put(`${API_URL}/${id}`, data, {
-          headers: {
-            ...authUtils.getAuthHeaders(),
-            "Content-Type": "application/json",
-          },
-        });
-      }
+      const isFormData = data instanceof FormData;
+      const response = await axios.post(`${API_URL}/${id}`, data, {
+        headers: {
+          ...authUtils.getAuthHeaders(),
+          "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+        },
+      });
       return response.data;
     } catch (error: any) {
       if (error.response) {
