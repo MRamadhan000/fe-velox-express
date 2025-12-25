@@ -4,7 +4,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { authUtils } from '@/app/utils/auth';
 import { authService } from '@/app/services/auth_service';
-import { LogOut, Shield, User, Settings, BarChart3, Package } from 'lucide-react';
+import { 
+  LogOut, Shield, User, Settings, BarChart3, Package, 
+  Truck, Users, Activity, ChevronRight, Bell
+} from 'lucide-react';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -21,7 +24,6 @@ export default function AdminDashboard() {
       try {
         const profile = await authService.getProfile();
         if (profile.user.role !== 'admin') {
-          // Jika bukan admin, redirect ke user dashboard
           window.location.href = '/dashboard';
           return;
         }
@@ -45,134 +47,154 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-14 w-14 border-t-4 border-b-4 border-red-600"></div>
+          <p className="mt-4 text-slate-600 font-medium animate-pulse">Initializing Secure Session...</p>
         </div>
       </div>
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-[#f8fafc]">
+      {/* Top Navbar */}
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-4">
-              <Shield className="w-8 h-8 text-red-600" />
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-3">
+              <div className="bg-red-600 p-2 rounded-xl shadow-lg shadow-red-200">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-600">VeloxExpress Administration Panel</p>
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">Velox<span className="text-red-600">Admin</span></h1>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-slate-500">System Online</p>
+                </div>
               </div>
             </div>
-            <button
-              onClick={logout}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
+            
+            <div className="flex items-center gap-4">
+               <button className="p-2 text-slate-400 hover:text-slate-600 transition relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              </button>
+              <div className="h-8 w-[1px] bg-slate-200 mx-2"></div>
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all shadow-md active:scale-95 text-sm font-semibold"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Welcome Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-              <Shield className="w-8 h-8 text-red-600" />
+        <div className="relative overflow-hidden bg-slate-900 rounded-[2rem] p-8 mb-10 shadow-2xl">
+            {/* Dekorasi Background */}
+            <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-red-600/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
+            
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                    <div className="w-20 h-20 bg-gradient-to-tr from-red-600 to-orange-400 rounded-2xl flex items-center justify-center shadow-inner">
+                        <User className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 bg-green-500 border-4 border-slate-900 w-8 h-8 rounded-full flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-white" />
+                    </div>
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold text-white tracking-tight">
+                    Welcome back, {user.name.split(' ')[0]}!
+                  </h2>
+                  <p className="text-slate-400 font-medium">{user.email}</p>
+                  <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-bold uppercase tracking-wider">
+                    Super Administrator
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-right hidden md:block border-l border-white/10 pl-8">
+                <p className="text-slate-500 text-xs font-bold uppercase">System Status</p>
+                <p className="text-white font-mono text-lg font-bold">STABLE</p>
+                <p className="text-slate-500 text-[10px] mt-1 italic">Last Refreshed: {new Date().toLocaleTimeString()}</p>
+              </div>
             </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {[
+                { label: 'Total Shipments', val: '1,284', icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+                { label: 'Active Drivers', val: '42', icon: Truck, color: 'text-orange-600', bg: 'bg-orange-50' },
+                { label: 'System Reach', val: '98.2%', icon: Activity, color: 'text-green-600', bg: 'bg-green-50' },
+                { label: 'Total Users', val: '850', icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
+            ].map((stat, i) => (
+                <div key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+                    <div className={`${stat.bg} ${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                        <stat.icon className="w-6 h-6" />
+                    </div>
+                    <p className="text-slate-500 text-sm font-semibold">{stat.label}</p>
+                    <p className="text-2xl font-black text-slate-900 mt-1">{stat.val}</p>
+                </div>
+            ))}
+        </div>
+
+        {/* Action Grid */}
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-10">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                Welcome back, {user.name}!
-              </h2>
-              <p className="text-gray-600">Administrator • {user.email}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Last login: {new Date().toLocaleDateString()}
-              </p>
+                <h3 className="text-2xl font-bold text-slate-900">Control Center</h3>
+                <p className="text-slate-500 font-medium">Manage your logistics ecosystem efficiently</p>
             </div>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Package className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Packages</p>
-                <p className="text-2xl font-bold text-gray-900">1,234</p>
-              </div>
-            </div>
+            <BarChart3 className="w-8 h-8 text-slate-200" />
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <User className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active Users</p>
-                <p className="text-2xl font-bold text-gray-900">567</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <BarChart3 className="w-6 h-6 text-yellow-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">Rp 12.5M</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
               href="/admin/drivers"
-              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+              className="group flex flex-col p-6 bg-slate-50 border border-slate-200 rounded-[2rem] hover:bg-blue-600 hover:border-blue-600 transition-all duration-300"
             >
-              <User className="w-5 h-5 text-blue-600" />
-              <span className="font-medium">Manage Drivers</span>
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <span className="font-bold text-slate-900 group-hover:text-white text-lg">Manage Drivers</span>
+              <p className="text-slate-500 group-hover:text-blue-100 text-sm mt-2">Registration and performance tracking</p>
+              <ChevronRight className="w-5 h-5 mt-6 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all" />
             </Link>
 
             <Link
               href="/admin/shipments"
-              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+              className="group flex flex-col p-6 bg-slate-50 border border-slate-200 rounded-[2rem] hover:bg-purple-600 hover:border-purple-600 transition-all duration-300"
             >
-              <Package className="w-5 h-5 text-purple-600" />
-              <span className="font-medium">Manage Shipments</span>
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:scale-110 transition-transform">
+                <Package className="w-6 h-6 text-purple-600" />
+              </div>
+              <span className="font-bold text-slate-900 group-hover:text-white text-lg">Shipment Center</span>
+              <p className="text-slate-500 group-hover:text-purple-100 text-sm mt-2">Real-time tracking and dispatch</p>
+              <ChevronRight className="w-5 h-5 mt-6 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all" />
             </Link>
 
-            <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-              <Package className="w-5 h-5 text-green-600" />
-              <span className="font-medium">Packets Management</span>
-            </button>
-
-            <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-              <Settings className="w-5 h-5 text-gray-600" />
-              <span className="font-medium">System Settings</span>
+            <button className="group text-left flex flex-col p-6 bg-slate-50 border border-slate-200 rounded-[2rem] hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-300">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:scale-110 transition-transform">
+                <Activity className="w-6 h-6 text-emerald-600" />
+              </div>
+              <span className="font-bold text-slate-900 group-hover:text-white text-lg">Packet Analytics</span>
+              <p className="text-slate-500 group-hover:text-emerald-100 text-sm mt-2">Volume and efficiency reports</p>
+              <ChevronRight className="w-5 h-5 mt-6 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all" />
             </button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
