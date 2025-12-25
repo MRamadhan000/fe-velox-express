@@ -138,7 +138,7 @@ export default function FormData() {
               placeholder="Andi Wijaya"
               required
               disabled={isSubmitting}
-              className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
+              className="w-full px-5 py-3.5 border text-black border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
             />
           </div>
           <div>
@@ -151,7 +151,7 @@ export default function FormData() {
               placeholder="0812-3456-7890"
               required
               disabled={isSubmitting}
-              className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
+              className="w-full px-5 py-3.5 border text-black border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
             />
           </div>
           <div>
@@ -164,7 +164,7 @@ export default function FormData() {
               placeholder="Jl. Sudirman No. 123, Jakarta Selatan"
               required
               disabled={isSubmitting}
-              className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition resize-none disabled:opacity-60"
+              className="w-full px-5 py-3.5 border text-black border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition resize-none disabled:opacity-60"
             />
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function FormData() {
               placeholder="Budi Santoso"
               required
               disabled={isSubmitting}
-              className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
+              className="w-full px-5 py-3.5 border text-black border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
             />
           </div>
           <div>
@@ -197,7 +197,7 @@ export default function FormData() {
               placeholder="0857-8888-9999"
               required
               disabled={isSubmitting}
-              className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
+              className="w-full px-5 py-3.5 border text-black border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
             />
           </div>
           <div>
@@ -210,7 +210,7 @@ export default function FormData() {
               placeholder="Jl. Gatot Subroto No. 45, Bandung"
               required
               disabled={isSubmitting}
-              className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition resize-none disabled:opacity-60"
+              className="w-full px-5 py-3.5 border text-black border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition resize-none disabled:opacity-60"
             />
           </div>
         </div>
@@ -231,7 +231,7 @@ export default function FormData() {
               placeholder="2"
               required
               disabled={isSubmitting}
-              className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
+              className="w-full px-5 py-3.5 border text-black border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition disabled:opacity-60"
             />
           </div>
           <div>
@@ -243,7 +243,7 @@ export default function FormData() {
               type="file"
               accept="image/*"
               disabled={isSubmitting}
-              className="w-full text-sm text-gray-600 file:mr-4 file:py-3 file:px-7 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 file:font-semibold hover:file:bg-blue-100 cursor-pointer disabled:opacity-60"
+              className="w-full text-sm text-black file:mr-4 file:py-3 file:px-7 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700 file:font-semibold hover:file:bg-blue-100 cursor-pointer disabled:opacity-60"
             />
           </div>
         </div>

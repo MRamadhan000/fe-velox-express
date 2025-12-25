@@ -301,7 +301,7 @@ export default function AdminDriversPage() {
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-2">
                           <button
                             onClick={() => openEditModal(driver)}
                             className="p-2.5 bg-white border border-slate-200 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm"
@@ -349,7 +349,7 @@ export default function AdminDriversPage() {
                   <input
                     type="text" required value={formData.driver_name}
                     onChange={(e) => setFormData({...formData, driver_name: e.target.value})}
-                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium"
+                    className="w-full pl-11 pr-4 py-3.5 text-black bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium"
                     placeholder="Enter driver's full name"
                   />
                 </div>
@@ -362,7 +362,7 @@ export default function AdminDriversPage() {
                   <input
                     type="text" required value={formData.driver_license_number}
                     onChange={(e) => setFormData({...formData, driver_license_number: e.target.value})}
-                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-mono font-bold"
+                    className="w-full pl-11 pr-4 py-3.5 text-black bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-mono font-bold"
                     placeholder="E.g. 9801234455"
                   />
                 </div>
@@ -375,7 +375,7 @@ export default function AdminDriversPage() {
                   <input
                     type="number" required min="0" value={formData.current_capacity}
                     onChange={(e) => setFormData({...formData, current_capacity: parseInt(e.target.value) || 0})}
-                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
+                    className="w-full pl-11 pr-4 py-3.5 text-black bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
                   />
                 </div>
               </div>
