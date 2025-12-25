@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { authService } from '@/app/services/auth_service';
-import { Mail, Lock, Loader2, AlertCircle, Truck, Shield } from 'lucide-react';
+import { Mail, Lock, Loader2, AlertCircle, Truck, Shield, ArrowLeft, ChevronRight, LockKeyhole } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('admin@velox.com');
@@ -12,6 +12,7 @@ export default function AdminLoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // --- LOGIC TETAP SAMA ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -36,110 +37,139 @@ export default function AdminLoginPage() {
       setIsSubmitting(false);
     }
   };
+  // --- END OF LOGIC ---
 
   return (
-    <section className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <section className="min-h-screen bg-[#0f172a] flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Background patterns khas Admin (Dark Theme) */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-red-900/30 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px]" />
+      </div>
 
-        {/* Brand/Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-velox-blue tracking-tight">
-            VELOX<span className="text-blue-500">EXPRESS</span>
-          </Link>
-          <p className="text-gray-500 mt-2 flex items-center justify-center gap-2">
-            <Shield className="w-4 h-4 text-red-500" />
-            Admin Panel - Masuk sebagai Administrator
-          </p>
+      <div className="w-full max-w-[440px] relative z-10">
+        
+        {/* Admin Header */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-tr from-red-600 to-red-500 rounded-[2rem] shadow-2xl shadow-red-900/20 mb-6 border-4 border-white/10">
+            <Shield className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-3xl font-black text-white tracking-tighter italic">
+            VELOX<span className="text-red-500 not-italic">ADMIN</span>
+          </h1>
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <span className="h-[1px] w-8 bg-red-500/50"></span>
+            <p className="text-red-400 font-bold text-[10px] uppercase tracking-[0.3em]">Authorized Access Only</p>
+            <span className="h-[1px] w-8 bg-red-500/50"></span>
+          </div>
         </div>
 
-        {/* Login Card */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
+        {/* Login Card (Dark Glassmorphism) */}
+        <div className="bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-10 shadow-3xl shadow-black">
+          <div className="mb-8">
+            <h2 className="text-2xl font-black text-white tracking-tight leading-none">Control Center</h2>
+            <p className="text-sm font-medium text-slate-400 mt-2">Masukkan kredensial administrator Anda.</p>
+          </div>
+
+          {/* Alerts */}
           {errorMessage && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5" />
-              <p className="text-sm">{errorMessage}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p className="text-xs font-bold">{errorMessage}</p>
             </div>
           )}
 
           {successMessage && (
-            <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700">
-              ✅ {successMessage}
+            <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                <span className="text-[10px] text-white font-black">✓</span>
+              </div>
+              <p className="text-xs font-bold">{successMessage}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-
+            
             {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Mail className="w-5 h-5 text-red-600" />
-                Admin Email Address
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                Admin Identifier
               </label>
-              <input
-                type="email"
-                id="email"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition disabled:opacity-60"
-                placeholder="admin@velox.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-red-500 transition-colors">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  required
+                  disabled={isSubmitting}
+                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/5 rounded-2xl text-white font-bold text-sm placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 focus:bg-white/10 transition-all disabled:opacity-60"
+                  placeholder="admin@velox.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
             </div>
 
             {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Lock className="w-5 h-5 text-red-600" />
-                Admin Password
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                Security Key
               </label>
-              <input
-                type="password"
-                id="password"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition disabled:opacity-60"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-red-500 transition-colors">
+                  <LockKeyhole className="w-5 h-5" />
+                </div>
+                <input
+                  type="password"
+                  id="password"
+                  required
+                  disabled={isSubmitting}
+                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/5 rounded-2xl text-white font-bold text-sm placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 focus:bg-white/10 transition-all disabled:opacity-60"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition shadow-md active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full py-4 bg-red-600 text-white font-black text-xs uppercase tracking-[0.3em] rounded-2xl hover:bg-red-500 transition-all shadow-xl shadow-red-900/20 active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-60 relative group"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing in...
+                  Verifying...
                 </>
               ) : (
                 <>
-                  <Shield className="w-4 h-4" />
-                  Masuk sebagai Admin
+                  Access Terminal
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
           {/* Footer Card */}
-          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-            <p className="text-gray-500 text-sm">
-              Bukan admin?{' '}
-              <Link href="/auth/login" className="text-velox-blue font-bold hover:underline">
-                Masuk sebagai User
+          <div className="mt-10 pt-8 border-t border-white/5 text-center">
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">
+              Bukan Administrator?{' '}
+              <Link href="/auth/login" className="text-red-500 hover:text-red-400 transition-colors ml-1">
+                User Portal
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Back to Home Link */}
+        {/* Back Link */}
         <div className="text-center mt-8">
-          <Link href="/" className="text-sm text-gray-400 hover:text-velox-blue transition inline-flex items-center gap-2">
-            <span>←</span> Kembali ke Beranda
+          <Link href="/" className="group inline-flex items-center gap-2 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] hover:text-red-500 transition-colors">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Beranda Utama
           </Link>
         </div>
       </div>
