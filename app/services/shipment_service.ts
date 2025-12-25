@@ -125,6 +125,17 @@ class ShipmentService {
       throw new Error(error.response?.data?.message || error.response?.data?.error || 'Failed to update shipment');
     }
   }
+
+  async deleteShipment(id: number): Promise<void> {
+    try {
+      await axios.delete(`${API_BASE_URL}/shipments/${id}`, {
+        headers: authUtils.getAuthHeaders()
+      });
+    } catch (error: any) {
+      console.error('Error deleting shipment:', error);
+      throw new Error(error.response?.data?.message || 'Failed to delete shipment');
+    }
+  }
 }
 
 export const shipmentService = new ShipmentService();

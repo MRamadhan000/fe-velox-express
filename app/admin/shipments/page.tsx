@@ -10,7 +10,7 @@ import { authService } from '@/app/services/auth_service';
 import {
   Truck, Package, User, Search, Loader2, AlertCircle,
   CheckCircle, Clock, ArrowLeft, Edit, Save, X, 
-  MapPin, Calendar, Scale, ChevronRight
+  MapPin, Calendar, Scale, ChevronRight, Trash2
 } from 'lucide-react';
 
 export default function AdminShipmentsPage() {
@@ -28,6 +28,7 @@ export default function AdminShipmentsPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [updating, setUpdating] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   // --- LOGIC TETAP SAMA (TIDAK DIUBAH) ---
   useEffect(() => {
@@ -119,6 +120,22 @@ export default function AdminShipmentsPage() {
       }
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleDeleteShipment = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this shipment? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeleting(id);
+    try {
+      await shipmentService.deleteShipment(id);
+      await fetchShipments();
+    } catch (error: any) {
+      setError(error.message || 'Failed to delete shipment');
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -255,7 +272,7 @@ export default function AdminShipmentsPage() {
                     <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Route Details</th>
                     <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Driver Assignment</th>
                     <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Created At</th>
-                    <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400 text-right">Edit</th>
+                    <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -321,12 +338,25 @@ export default function AdminShipmentsPage() {
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">
-                        <button
-                          onClick={() => openDriverModal(shipment)}
-                          className="p-2.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all group-hover:shadow-md active:scale-95"
-                        >
-                          <Edit className="w-4.5 h-4.5" />
-                        </button>
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => openDriverModal(shipment)}
+                            className="p-2.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all group-hover:shadow-md active:scale-95"
+                          >
+                            <Edit className="w-4.5 h-4.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteShipment(shipment.id)}
+                            disabled={deleting === shipment.id}
+                            className="p-2.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-xl hover:bg-red-600 hover:text-white hover:border-red-600 transition-all group-hover:shadow-md active:scale-95 disabled:opacity-50"
+                          >
+                            {deleting === shipment.id ? (
+                              <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4.5 h-4.5" />
+                            )}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
