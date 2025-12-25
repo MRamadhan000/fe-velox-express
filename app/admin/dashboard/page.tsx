@@ -184,14 +184,17 @@ export default function AdminDashboard() {
               <ChevronRight className="w-5 h-5 mt-6 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all" />
             </Link>
 
-            <button className="group text-left flex flex-col p-6 bg-slate-50 border border-slate-200 rounded-[2rem] hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-300">
+            <Link
+              href="/admin/packets"
+              className="group flex flex-col p-6 bg-slate-50 border border-slate-200 rounded-[2rem] hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-300"
+            >
               <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:scale-110 transition-transform">
-                <Activity className="w-6 h-6 text-emerald-600" />
+                <Package className="w-6 h-6 text-emerald-600" />
               </div>
-              <span className="font-bold text-slate-900 group-hover:text-white text-lg">Packet Analytics</span>
-              <p className="text-slate-500 group-hover:text-emerald-100 text-sm mt-2">Volume and efficiency reports</p>
+              <span className="font-bold text-slate-900 group-hover:text-white text-lg">Manage Packets</span>
+              <p className="text-slate-500 group-hover:text-emerald-100 text-sm mt-2">Create and manage delivery packets</p>
               <ChevronRight className="w-5 h-5 mt-6 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all" />
-            </button>
+            </Link>
           </div>
         </div>
       </main>
