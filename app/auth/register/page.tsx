@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { authService } from '@/app/services/auth_service';
-import { User, Mail, Lock, Loader2, AlertCircle, Truck } from 'lucide-react';
+import { User, Mail, Lock, Loader2, AlertCircle, Truck, ArrowLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // --- LOGIC TETAP SAMA ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -44,144 +45,177 @@ export default function RegisterPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  // --- END OF LOGIC ---
 
   return (
-    // Background diganti menjadi abu-abu sangat muda agar card putih terlihat kontras
-    <section className="min-h-screen bg-gray-50 flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-md">
+    <section className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6 relative overflow-hidden py-16">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-blue-100/40 rounded-full blur-[100px]" />
+      <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-indigo-100/40 rounded-full blur-[100px]" />
+
+      <div className="w-full max-w-[480px] relative z-10">
         
-        {/* Brand/Logo - Sekarang menggunakan warna Biru Utama */}
+        {/* Brand/Logo Section */}
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-velox-blue tracking-tight">
-            VELOX<span className="text-blue-500">EXPRESS</span>
-          </Link>
-          <p className="text-gray-500 mt-2">Daftar akun untuk mulai mengirim paket</p>
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-2xl shadow-xl shadow-blue-100 mb-4">
+            <Truck className="w-7 h-7 text-white" />
+          </div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tighter">
+            JOIN <span className="text-blue-600">VELOX</span>
+          </h1>
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mt-2">Create your shipping account</p>
         </div>
 
-        {/* Register Card - Putih Bersih dengan Shadow Halus */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
+        {/* Register Card */}
+        <div className="bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-slate-200/50">
+          
+          {/* Alert Messages */}
           {errorMessage && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5" />
-              <p className="text-sm">{errorMessage}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p className="text-xs font-bold leading-tight">{errorMessage}</p>
             </div>
           )}
 
           {successMessage && (
-            <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700">
-              ✅ {successMessage}
+            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-600 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                <ShieldCheck className="w-3 h-3 text-white" />
+              </div>
+              <p className="text-xs font-bold leading-tight">{successMessage}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             
             {/* Full Name Field */}
-            <div>
-              <label htmlFor="name" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <User className="w-5 h-5 text-blue-600" />
-                Nama Lengkap
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+                Full Name
               </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition disabled:opacity-60"
-                placeholder="Masukkan nama lengkap"
-                value={formData.name}
-                onChange={handleChange}
-              />
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                  <User className="w-5 h-5" />
+                </div>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  disabled={isSubmitting}
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-sm placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:bg-white transition-all disabled:opacity-60"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Mail className="w-5 h-5 text-blue-600" />
-                Email
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+                Email Address
               </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition disabled:opacity-60"
-                placeholder="nama@email.com"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  disabled={isSubmitting}
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-sm placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:bg-white transition-all disabled:opacity-60"
+                  placeholder="name@company.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Lock className="w-5 h-5 text-blue-600" />
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition disabled:opacity-60"
-                placeholder="Minimal 6 karakter"
-                value={formData.password}
-                onChange={handleChange}
-              />
+            {/* Password Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+                  Password
+                </label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-xs placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:bg-white transition-all disabled:opacity-60"
+                    placeholder="Min 6 chars"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="password_confirmation" className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+                  Confirm
+                </label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="password"
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-xs placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:bg-white transition-all disabled:opacity-60"
+                    placeholder="Repeat"
+                    value={formData.password_confirmation}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Confirm Password Field */}
-            <div>
-              <label htmlFor="password_confirmation" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Lock className="w-5 h-5 text-blue-600" />
-                Konfirmasi Password
-              </label>
-              <input
-                type="password"
-                id="password_confirmation"
-                name="password_confirmation"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition disabled:opacity-60"
-                placeholder="Ulangi password"
-                value={formData.password_confirmation}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Submit Button - Sekarang menggunakan background Biru */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-md active:scale-[0.98] mt-2 flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full py-4 bg-slate-900 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-blue-600 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-60 mt-4 group"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Creating account...
+                  Creating Account...
                 </>
               ) : (
-                'Daftar Akun'
+                <>
+                  Create Account
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </>
               )}
             </button>
           </form>
 
           {/* Login Link */}
-          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-            <p className="text-gray-500 text-sm">
-              Sudah punya akun?{' '}
-              <Link href="/auth/login" className="text-blue-600 font-bold hover:underline">
-                Masuk di sini
+          <div className="mt-10 pt-8 border-t border-slate-50 text-center">
+            <p className="text-slate-400 text-xs font-bold">
+              Sudah memiliki akun?{' '}
+              <Link href="/auth/login" className="text-blue-600 hover:text-blue-700 transition-colors">
+                Masuk Sekarang
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-8 space-x-4">
-          <Link href="/" className="text-sm text-gray-400 hover:text-velox-blue transition">
+        {/* Back to Home Link */}
+        <div className="text-center mt-8">
+          <Link href="/" className="group inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-blue-600 transition-colors">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Kembali ke Beranda
           </Link>
         </div>
