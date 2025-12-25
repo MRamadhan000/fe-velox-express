@@ -6,10 +6,8 @@ import Link from 'next/link';
 import { packetService } from '@/app/services/packet_service';
 import { authUtils } from '@/app/utils/auth';
 import { authService } from '@/app/services/auth_service';
-import { PacketPayload } from '@/app/types/packet';
 import {
-  Package, Plus, Edit, Trash2, Search, Loader2, AlertCircle,
-  CheckCircle, X, User, Phone, MapPin, Scale, ArrowLeft, ChevronRight, MoreVertical, Upload
+  Package, Edit, Search, Loader2, ArrowLeft
 } from 'lucide-react';
 
 interface Packet {
@@ -35,25 +33,6 @@ export default function AdminPacketsPage() {
   const [packets, setPackets] = useState<Packet[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [editingPacket, setEditingPacket] = useState<Packet | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [packetToDelete, setPacketToDelete] = useState<Packet | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  // Form state
-  const [formData, setFormData] = useState<PacketPayload>({
-    sender_name: '',
-    sender_phone: '',
-    pickup_address: '',
-    receiver_name: '',
-    receiver_phone: '',
-    destination_address: '',
-    weight: 0,
-    packet_image: null
-  });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -87,7 +66,7 @@ export default function AdminPacketsPage() {
       const data = await packetService.getAllPacketsAdmin();
       setPackets(data);
     } catch (error: any) {
-      setError(error.message || 'Failed to fetch packets');
+      console.error('Failed to fetch packets:', error);
     }
   };
 
@@ -96,123 +75,6 @@ export default function AdminPacketsPage() {
     packet.sender_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     packet.receiver_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const resetForm = () => {
-    setFormData({
-      sender_name: '',
-      sender_phone: '',
-      pickup_address: '',
-      receiver_name: '',
-      receiver_phone: '',
-      destination_address: '',
-      weight: 0,
-      packet_image: null
-    });
-    setEditingPacket(null);
-  };
-
-  const openModal = (packet?: Packet) => {
-    if (packet) {
-      setEditingPacket(packet);
-      setFormData({
-        sender_name: packet.sender_name,
-        sender_phone: packet.sender_phone,
-        pickup_address: packet.pickup_address,
-        receiver_name: packet.receiver_name,
-        receiver_phone: packet.receiver_phone,
-        destination_address: packet.destination_address,
-        weight: packet.weight,
-        packet_image: null // Keep existing image
-      });
-    } else {
-      resetForm();
-    }
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    resetForm();
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  setError(null);
-
-  try {
-    const submitData = new FormData();
-    submitData.append('sender_name', formData.sender_name);
-    submitData.append('sender_phone', formData.sender_phone);
-    submitData.append('pickup_address', formData.pickup_address);
-    submitData.append('receiver_name', formData.receiver_name);
-    submitData.append('receiver_phone', formData.receiver_phone);
-    submitData.append('destination_address', formData.destination_address);
-    submitData.append('weight', formData.weight.toString());
-    if (formData.packet_image) {
-      submitData.append('packet_image', formData.packet_image);
-    }
-
-    // Debug: Log FormData contents
-    console.log('FormData contents:');
-    for (let [key, value] of submitData.entries()) {
-      console.log(key, value);
-    }
-
-    if (editingPacket) {
-      console.log('Updating packet:', editingPacket.id);
-      if (formData.packet_image) {
-        await packetService.update(editingPacket.id, submitData, true);
-      } else {
-        // Convert FormData to object for JSON request
-        const jsonData = {
-          sender_name: formData.sender_name,
-          sender_phone: formData.sender_phone,
-          pickup_address: formData.pickup_address,
-          receiver_name: formData.receiver_name,
-          receiver_phone: formData.receiver_phone,
-          destination_address: formData.destination_address,
-          weight: formData.weight
-        };
-        await packetService.update(editingPacket.id, jsonData, false);
-      }
-      setSuccess('Packet updated successfully');
-    } else {
-      await packetService.store(submitData);
-      setSuccess('Packet created successfully');
-    }
-
-    await fetchPackets();
-    closeModal();
-  } catch (error: any) {
-    console.error('Submit error:', error);
-    setError(error.message || 'Failed to save packet');
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
-  const handleDelete = async () => {
-    if (!packetToDelete) return;
-
-    setIsSubmitting(true);
-    try {
-      await packetService.delete(packetToDelete.id);
-      setSuccess('Packet deleted successfully');
-      await fetchPackets();
-      setShowDeleteModal(false);
-      setPacketToDelete(null);
-    } catch (error: any) {
-      setError(error.message || 'Failed to delete packet');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData(prev => ({ ...prev, packet_image: file }));
-  };
 
   if (loading) {
     return (
@@ -253,27 +115,6 @@ export default function AdminPacketsPage() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Success/Error Messages */}
-        {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <p className="text-green-800 font-medium">{success}</p>
-            <button onClick={() => setSuccess(null)} className="ml-auto text-green-600 hover:text-green-800">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <p className="text-red-800 font-medium">{error}</p>
-            <button onClick={() => setError(null)} className="ml-auto text-red-600 hover:text-red-800">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-
         {/* Header with Search and Add Button */}
         <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-100/50 mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
@@ -294,15 +135,6 @@ export default function AdminPacketsPage() {
                   className="w-full sm:w-80 pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700 placeholder-slate-400"
                 />
               </div>
-
-              {/* Add Button */}
-              <button
-                onClick={() => openModal()}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 active:scale-95"
-              >
-                <Plus className="w-5 h-5" />
-                Add Packet
-              </button>
             </div>
           </div>
         </div>
@@ -313,14 +145,7 @@ export default function AdminPacketsPage() {
             <div className="p-12 text-center">
               <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">No packets found</h3>
-              <p className="text-slate-600 mb-6">Get started by adding your first delivery packet</p>
-              <button
-                onClick={() => openModal()}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all"
-              >
-                <Plus className="w-5 h-5" />
-                Add Packet
-              </button>
+              <p className="text-slate-600 mb-6">No delivery packets available at the moment</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -328,6 +153,7 @@ export default function AdminPacketsPage() {
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100">
                     <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Receipt</th>
+                    <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Image</th>
                     <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Sender</th>
                     <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Receiver</th>
                     <th className="px-8 py-5 text-[11px] uppercase tracking-[0.15em] font-black text-slate-400">Weight</th>
@@ -343,6 +169,24 @@ export default function AdminPacketsPage() {
                           <span className="text-xs font-black text-blue-600 uppercase tracking-tighter mb-1">Receipt ID</span>
                           <span className="text-slate-900 font-bold font-mono tracking-tight">{packet.receipt_number}</span>
                         </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        {packet.packet_image ? (
+                          <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-slate-200 shadow-sm">
+                            <img
+                              src={`http://localhost:8001${packet.packet_image}`}
+                              alt="Packet"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = '/placeholder-image.png'; // Fallback image
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 rounded-xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
+                            <Package className="w-8 h-8 text-slate-400" />
+                          </div>
+                        )}
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex flex-col">
@@ -368,12 +212,12 @@ export default function AdminPacketsPage() {
                       <td className="px-8 py-6 text-right">
                         <div className="flex gap-2 justify-end">
                           <button
-                            onClick={() => openModal(packet)}
+                            onClick={() => router.push(`/admin/packets/edit/${packet.id}`)}
                             className="p-2.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all group-hover:shadow-md active:scale-95"
                           >
                             <Edit className="w-4.5 h-4.5" />
                           </button>
-                          <button
+                          {/* <button
                             onClick={() => {
                               setPacketToDelete(packet);
                               setShowDeleteModal(true);
@@ -381,7 +225,7 @@ export default function AdminPacketsPage() {
                             className="p-2.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-xl hover:bg-red-600 hover:text-white hover:border-red-600 transition-all group-hover:shadow-md active:scale-95"
                           >
                             <Trash2 className="w-4.5 h-4.5" />
-                          </button>
+                          </button> */}
                         </div>
                       </td>
                     </tr>
@@ -392,223 +236,6 @@ export default function AdminPacketsPage() {
           )}
         </div>
       </main>
-
-      {/* Create/Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
-            <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-black text-slate-900 leading-tight">{editingPacket ? 'Edit Packet' : 'Add New Packet'}</h3>
-                <p className="text-sm text-slate-400 font-medium">{editingPacket ? `Editing ${editingPacket.receipt_number}` : 'Create a new delivery packet'}</p>
-              </div>
-              <button onClick={closeModal} className="p-2.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400"><X className="w-6 h-6" /></button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Sender Info */}
-                <div className="space-y-4">
-                  <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    Sender Information
-                  </h4>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Sender Name</label>
-                    <input
-                      type="text"
-                      value={formData.sender_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, sender_name: e.target.value }))}
-                      className="w-full mt-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Sender Phone</label>
-                    <input
-                      type="tel"
-                      value={formData.sender_phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, sender_phone: e.target.value }))}
-                      className="w-full mt-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Pickup Address</label>
-                    <textarea
-                      value={formData.pickup_address}
-                      onChange={(e) => setFormData(prev => ({ ...prev, pickup_address: e.target.value }))}
-                      rows={3}
-                      className="w-full mt-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700 resize-none"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Receiver Info */}
-                <div className="space-y-4">
-                  <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    Receiver Information
-                  </h4>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Receiver Name</label>
-                    <input
-                      type="text"
-                      value={formData.receiver_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, receiver_name: e.target.value }))}
-                      className="w-full mt-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Receiver Phone</label>
-                    <input
-                      type="tel"
-                      value={formData.receiver_phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, receiver_phone: e.target.value }))}
-                      className="w-full mt-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Destination Address</label>
-                    <textarea
-                      value={formData.destination_address}
-                      onChange={(e) => setFormData(prev => ({ ...prev, destination_address: e.target.value }))}
-                      rows={3}
-                      className="w-full mt-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700 resize-none"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Package Details */}
-              <div className="space-y-4">
-                <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Package className="w-5 h-5" />
-                  Package Details
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Weight (kg)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      value={formData.weight}
-                      onChange={(e) => setFormData(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
-                      className="w-full mt-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400 ml-1">Package Image</label>
-                    <div className="mt-2">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        id="packet_image"
-                      />
-                      <label
-                        htmlFor="packet_image"
-                        className="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-100 transition-colors"
-                      >
-                        <Upload className="w-5 h-5 text-slate-400" />
-                        <span className="font-bold text-slate-700">
-                          {formData.packet_image ? formData.packet_image.name : 'Choose image...'}
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-6">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-[1.5] px-6 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 disabled:opacity-50 shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-2 active:scale-95"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      {editingPacket ? 'Updating...' : 'Creating...'}
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-5 h-5" />
-                      {editingPacket ? 'Update Packet' : 'Create Packet'}
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && packetToDelete && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
-            <div className="px-8 py-6 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-black text-slate-900 leading-tight">Delete Packet</h3>
-                  <p className="text-sm text-slate-400 font-medium">This action cannot be undone</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-8">
-              <p className="text-slate-700 font-medium mb-6">
-                Are you sure you want to delete packet <span className="font-bold text-slate-900">{packetToDelete.receipt_number}</span>?
-                This will permanently remove the packet and cannot be undone.
-              </p>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={isSubmitting}
-                  className="flex-1 px-6 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 disabled:opacity-50 shadow-xl shadow-red-100 transition-all flex items-center justify-center gap-2 active:scale-95"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Deleting...
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="w-5 h-5" />
-                      Delete
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
