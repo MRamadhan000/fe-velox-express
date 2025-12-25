@@ -78,7 +78,7 @@ class ShipmentService {
 
   async updateShipmentDriver(id: number, driverId: number | null): Promise<Shipment> {
     try {
-      const response = await axios.put(`${API_BASE_URL}/shipments/${id}`, {
+      const response = await axios.put(`${API_BASE_URL}/shipments/${id}/status-driver`, {
         driver_id: driverId
       }, {
         headers: authUtils.getAuthHeaders()
@@ -92,7 +92,7 @@ class ShipmentService {
 
   async updateShipmentStatus(id: number, status: string): Promise<Shipment> {
     try {
-      const response = await axios.put(`${API_BASE_URL}/shipments/${id}`, {
+      const response = await axios.put(`${API_BASE_URL}/shipments/${id}/status-driver`, {
         status: status
       }, {
         headers: authUtils.getAuthHeaders()
@@ -101,6 +101,28 @@ class ShipmentService {
     } catch (error: any) {
       console.error('Error updating shipment status:', error);
       throw new Error(error.response?.data?.message || 'Failed to update shipment status');
+    }
+  }
+
+  async updateShipmentStatusAndDriver(id: number, status: string, driverId: number | null): Promise<Shipment> {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/shipments/${id}/status-driver`, {
+        status: status,
+        driver_id: driverId
+      }, {
+        headers: authUtils.getAuthHeaders()
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error updating shipment status and driver:', error);
+
+      // Handle specific backend error messages
+      if (error.response?.status === 400 && error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+
+      // Handle other error cases
+      throw new Error(error.response?.data?.message || error.response?.data?.error || 'Failed to update shipment');
     }
   }
 }

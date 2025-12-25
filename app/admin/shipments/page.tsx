@@ -36,6 +36,7 @@ export default function AdminShipmentsPage() {
   const [selectedDriver, setSelectedDriver] = useState<number | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [updating, setUpdating] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -83,20 +84,35 @@ export default function AdminShipmentsPage() {
     }
   };
 
+  const validateDriverCapacity = (driverId: number | null, shipment: Shipment): boolean => {
+    if (!driverId) return true; // No driver selected is valid
+
+    const driver = drivers.find(d => d.id === driverId);
+    if (!driver) return false;
+
+    // Check if driver has enough capacity for the packet
+    return driver.current_capacity >= shipment.packet.weight;
+  };
+
   const handleUpdateShipment = async () => {
     if (!selectedShipment) return;
 
-    setUpdating(true);
-    try {
-      // Update driver if changed
-      if (selectedDriver !== selectedShipment.driver_id) {
-        await shipmentService.updateShipmentDriver(selectedShipment.id, selectedDriver);
-      }
+    // Frontend validation for driver capacity
+    if (selectedDriver && !validateDriverCapacity(selectedDriver, selectedShipment)) {
+      const driver = drivers.find(d => d.id === selectedDriver);
+      setModalError(`Driver ${driver?.driver_name} doesn't have enough capacity. Required: ${selectedShipment.packet.weight}kg, Available: ${driver?.current_capacity}kg`);
+      return;
+    }
 
-      // Update status if changed
-      if (selectedStatus && selectedStatus !== selectedShipment.status) {
-        await shipmentService.updateShipmentStatus(selectedShipment.id, selectedStatus);
-      }
+    setUpdating(true);
+    setModalError(null); // Clear previous modal errors
+
+    try {
+      await shipmentService.updateShipmentStatusAndDriver(
+        selectedShipment.id,
+        selectedStatus,
+        selectedDriver
+      );
 
       await fetchShipments(); // Refresh data
       setShowDriverModal(false);
@@ -104,7 +120,17 @@ export default function AdminShipmentsPage() {
       setSelectedDriver(null);
       setSelectedStatus('');
     } catch (error: any) {
-      setError(error.message || 'Failed to update shipment');
+      // Handle validation errors in modal
+      if (error.message.includes('Kapasitas Driver') || error.message.includes('kapasitas')) {
+        setModalError(error.message);
+      } else {
+        // For other errors, show in main error state and close modal
+        setError(error.message || 'Failed to update shipment');
+        setShowDriverModal(false);
+        setSelectedShipment(null);
+        setSelectedDriver(null);
+        setSelectedStatus('');
+      }
     } finally {
       setUpdating(false);
     }
@@ -122,6 +148,7 @@ export default function AdminShipmentsPage() {
     setSelectedShipment(null);
     setSelectedDriver(null);
     setSelectedStatus('');
+    setModalError(null);
   };
 
   const filteredShipments = shipments.filter(shipment =>
@@ -259,7 +286,7 @@ export default function AdminShipmentsPage() {
                       Sender
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Receiver
+                      Weight
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Driver
@@ -298,6 +325,9 @@ export default function AdminShipmentsPage() {
                           <p className="font-medium text-gray-900">{shipment.packet.receiver_name}</p>
                           <p>{shipment.packet.receiver_phone}</p>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <span className="font-medium">{shipment.packet.weight}kg</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -359,7 +389,20 @@ export default function AdminShipmentsPage() {
                 <p className="text-sm text-gray-600">
                   <strong>Current Status:</strong> {selectedShipment.status}
                 </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Weight:</strong> {selectedShipment.packet.weight}kg
+                </p>
               </div>
+
+              {/* Modal Error Message */}
+              {modalError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-red-500" />
+                    <p className="text-sm text-red-700">{modalError}</p>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-4">
                 <div>
@@ -372,11 +415,20 @@ export default function AdminShipmentsPage() {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   >
                     <option value="">No Driver</option>
-                    {drivers.map((driver) => (
-                      <option key={driver.id} value={driver.id}>
-                        {driver.driver_name} (License: {driver.driver_license_number})
-                      </option>
-                    ))}
+                    {drivers.map((driver) => {
+                      const hasCapacity = selectedShipment ? driver.current_capacity >= selectedShipment.packet.weight : true;
+                      return (
+                        <option
+                          key={driver.id}
+                          value={driver.id}
+                          disabled={!hasCapacity}
+                          className={!hasCapacity ? 'text-red-500' : ''}
+                        >
+                          {driver.driver_name} (License: {driver.driver_license_number}) - Capacity: {driver.current_capacity}kg
+                          {!hasCapacity && selectedShipment && ' ⚠️ Insufficient capacity'}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 
